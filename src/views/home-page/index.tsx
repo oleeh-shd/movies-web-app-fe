@@ -15,7 +15,7 @@ type Props = {
 export const HomePage: FC<Props> = ({ changeView }) => {
     return (
         <section className="mb-[120px] flex flex-col items-center">
-            <div className="mb-20 flex w-full items-center justify-between md:mb-[120px]">
+            <div className="mb-20 flex w-full items-center justify-between lg:mb-[120px]">
                 <div className="flex items-center gap-3">
                     <Heading variant="h2" title="My movies" />
                     <button
