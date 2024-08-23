@@ -11,14 +11,14 @@ import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import * as yup from "yup";
 
-import { createMovie } from "@/api/create-movie";
+import { Movie } from "@/api/get-movie-list";
+import { updateMovie } from "@/api/update-movie";
 import { uploadPoster } from "@/api/upload-poster";
 import { Button } from "@/components/button";
 import { Heading } from "@/components/heading";
 
 import { Input } from "@/components/input";
 import { Loader } from "@/components/loader";
-
 import { fileTypes, maxPublishingYear } from "@/utils/constants";
 import { cn } from "@/utils/tailwind";
 
@@ -27,10 +27,9 @@ import { useMovieStore } from "@/zustand/useMovieStore";
 import { HomePageView } from "../../../app/page";
 
 const validationSchema = yup.object().shape({
-    title: yup.string().required("Please enter your movie title"),
+    title: yup.string(),
     publishingYear: yup
         .string()
-        .required("Please enter your movie publishing year")
         .matches(/^\d{4}$/, "Please enter valid year")
         .test(
             "max-value",
@@ -39,37 +38,38 @@ const validationSchema = yup.object().shape({
                 return value ? parseInt(value, 10) <= maxPublishingYear : false;
             }
         ),
-    posterId: yup.string().required("Please upload poster image"),
+    posterId: yup.number(),
 });
 
 type FormInputs = {
     title: string;
     publishingYear: string;
-    posterId: string;
+    posterId: number;
 };
 
-type CreateMovieProps = {
+type UpdateMovieProps = {
+    movieToUpdate: Movie;
     changeView: (view: HomePageView) => void;
 };
 
-const defaultFormVaues = {
-    title: "",
-    publishingYear: "",
-    posterId: "",
-};
-
-export const CreateMovie: FC<CreateMovieProps> = ({ changeView }) => {
+export const UpdateMovie: FC<UpdateMovieProps> = ({
+    movieToUpdate,
+    changeView,
+}) => {
     const {
         control,
         handleSubmit,
         formState: { errors },
         reset,
     } = useForm({
-        resolver: yupResolver<FormInputs>(validationSchema),
-        defaultValues: defaultFormVaues,
+        resolver: yupResolver<Partial<FormInputs>>(validationSchema),
+        defaultValues: {
+            ...movieToUpdate,
+            publishingYear: String(movieToUpdate.publishingYear),
+        },
     });
 
-    const { fetchMovies, loading } = useMovieStore();
+    const { fetchMovies } = useMovieStore();
 
     const [file, setFile] = useState<File | null>(null);
     const [uploading, setUploading] = useState(false);
@@ -92,23 +92,25 @@ export const CreateMovie: FC<CreateMovieProps> = ({ changeView }) => {
         title,
         posterId,
         publishingYear,
-    }: FormInputs) => {
+    }: Partial<FormInputs>) => {
         try {
-            const { data } = await createMovie({
-                title,
-                posterId: Number(posterId),
-                publishingYear: Number(publishingYear),
+            const { data } = await updateMovie(movieToUpdate.id, {
+                title: title ? title : undefined,
+                posterId: posterId ? Number(posterId) : undefined,
+                publishingYear: publishingYear
+                    ? Number(publishingYear)
+                    : undefined,
             });
-            toast.success(data.message);
 
             await fetchMovies({ limit: 0, offset: 0 });
 
-            reset();
+            toast.success(data.message);
 
             setFile(null);
+            reset();
             changeView("home");
         } catch (error) {
-            toast.error("Creating failed");
+            toast.error("Updating failed");
         }
     };
 
@@ -117,10 +119,11 @@ export const CreateMovie: FC<CreateMovieProps> = ({ changeView }) => {
             <div>
                 <Heading
                     variant="h2"
-                    title="Create a new movie"
+                    title="Update movie"
                     classes="mb-20 lg:mb-[120px] text-left!"
                 />
             </div>
+
             <form
                 onSubmit={handleSubmit(onSubmit)}
                 className="flex w-full flex-col-reverse items-center gap-6 lg:flex-row lg:items-start lg:gap-[127px]"
@@ -240,10 +243,7 @@ export const CreateMovie: FC<CreateMovieProps> = ({ changeView }) => {
                             text="Cancel"
                             onClick={() => changeView("home")}
                         />
-                        <Button
-                            variant="contained"
-                            text={loading ? <Loader size="small" /> : "Submit"}
-                        />
+                        <Button variant="contained" text="Submit" />
                     </div>
                 </div>
             </form>

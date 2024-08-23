@@ -4,7 +4,11 @@ import { Montserrat } from "next/font/google";
 import Image from "next/image";
 
 import "../src/styles/globals.css";
+import { ToastContainer } from "react-toastify";
+
 import { cn } from "@/utils/tailwind";
+
+import "react-toastify/dist/ReactToastify.css";
 
 const montserrat = Montserrat({ subsets: ["latin"] });
 
@@ -36,6 +40,7 @@ export default function RootLayout({
                     height={111}
                     className="absolute bottom-0 left-0"
                 />
+                <ToastContainer />
             </body>
         </html>
     );

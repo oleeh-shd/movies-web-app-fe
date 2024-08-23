@@ -1,12 +1,11 @@
-import { ButtonHTMLAttributes, FC } from "react";
+import { ButtonHTMLAttributes, FC, ReactElement } from "react";
 
 import { cn } from "@/utils/tailwind";
-
 type Variant = "contained" | "outlined";
 
 type Props = {
     variant: Variant;
-    text: string;
+    text: string | ReactElement;
 } & ButtonHTMLAttributes<HTMLButtonElement>;
 
 const variants: Record<Variant, string> = {
@@ -19,7 +18,7 @@ export const Button: FC<Props> = ({ type, variant, text, onClick }) => {
         <button
             type={type}
             className={cn(
-                "py-4 px-[28px] rounded-[10px] text-base text-center font-bold text-white",
+                "flex justify-center  py-4 px-[28px] rounded-[10px] text-base text-center font-bold text-white",
                 variants[variant]
             )}
             onClick={onClick}

@@ -16,7 +16,9 @@ export const Input: FC<InputProps> = ({
         <label
             className={cn(
                 "flex justify-between rounded-[10px] border px-4 pt-[11px] pb-2.5 cursor-pointer",
-                disabled ? "bg-disabled" : "bg-input",
+                disabled
+                    ? "bg-disabled"
+                    : "bg-input hover:outline outline-input/50",
                 error ? "border-red-500" : "border-transparent",
                 className
             )}
