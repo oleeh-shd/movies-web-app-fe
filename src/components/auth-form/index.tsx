@@ -1,6 +1,8 @@
 "use client";
 
-import { FC } from "react";
+import { useRouter } from "next/navigation";
+
+import { FC, useState } from "react";
 
 import { ErrorMessage } from "@hookform/error-message";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -8,10 +10,12 @@ import { Controller, useForm } from "react-hook-form";
 
 import * as yup from "yup";
 
+import { CustomError } from "@/api/axios";
+import { useAuthStore } from "@/zustand/authStore";
+
 import { Button } from "../button";
-import { Checkbox } from "../checkbox";
-import { Heading } from "../heading";
 import { Input } from "../input";
+import { Loader } from "../loader";
 
 type FormInputs = {
     email: string;
@@ -31,7 +35,13 @@ const validationSchema = yup.object({
         .required("Please enter your password"),
 });
 
-export const SignInForm: FC = () => {
+type ActionType = "sign-in" | "sign-up";
+
+type AuthFormProps = {
+    action: ActionType;
+};
+
+export const AuthForm: FC<AuthFormProps> = ({ action }) => {
     const {
         control,
         handleSubmit,
@@ -40,13 +50,34 @@ export const SignInForm: FC = () => {
         resolver: yupResolver(validationSchema),
     });
 
-    const onSubmit = async ({ email, password }: FormInputs) => {};
+    const router = useRouter();
+
+    const [error, setError] = useState("");
+
+    const { signIn, signUp, loading } = useAuthStore();
+
+    const onSubmit = async ({ email, password }: FormInputs) => {
+        try {
+            if (action === "sign-in") {
+                await signIn({ email, password });
+            }
+
+            if (action === "sign-up") {
+                await signUp({ email, password });
+            }
+
+            setError("");
+            router.push("/");
+        } catch (error) {
+            console.log(error, "error");
+            setError((error as CustomError).response?.data.message);
+        }
+    };
     return (
         <form
             onSubmit={handleSubmit(onSubmit)}
             className="flex w-full flex-col gap-6 md:w-[300px] "
         >
-            <Heading variant="h1" title="Sign in" />
             <Controller
                 name="email"
                 control={control}
@@ -97,10 +128,26 @@ export const SignInForm: FC = () => {
                 )}
             />
 
-            <div className="mx-auto">
+            {error ? (
+                <span className="ml-3 text-sm text-red-500">{error}</span>
+            ) : null}
+
+            {/* <div className="mx-auto">
                 <Checkbox />
-            </div>
-            <Button type="submit" variant="contained" text="Login" />
+            </div> */}
+            <Button
+                type="submit"
+                variant="contained"
+                text={
+                    loading ? (
+                        <Loader size="small" />
+                    ) : action === "sign-in" ? (
+                        "Login"
+                    ) : (
+                        "Register"
+                    )
+                }
+            />
         </form>
     );
 };

@@ -7,6 +7,7 @@ import { Card } from "@/components/card";
 import { Heading } from "@/components/heading";
 import { Pagination } from "@/components/pagination";
 
+import { useAuthStore } from "@/zustand/authStore";
 import { useMovieStore } from "@/zustand/useMovieStore";
 
 import { HomePageView } from "../../../app/page";
@@ -17,6 +18,8 @@ type Props = {
 
 export const HomePage: FC<Props> = ({ changeView }) => {
     const { movies, setMovieToUpdate } = useMovieStore();
+    const { logout } = useAuthStore();
+
     const updateMovie = (movie: Movie) => {
         setMovieToUpdate(movie);
         changeView("update");
@@ -39,7 +42,10 @@ export const HomePage: FC<Props> = ({ changeView }) => {
                         />
                     </button>
                 </div>
-                <button className="flex items-center gap-3 hover:opacity-70">
+                <button
+                    onClick={logout}
+                    className="flex items-center gap-3 hover:opacity-70"
+                >
                     <span className="text-base font-bold">Logout</span>
                     <Image
                         src="/logout.svg"
@@ -58,7 +64,8 @@ export const HomePage: FC<Props> = ({ changeView }) => {
                     />
                 ))}
             </div>
-            <Pagination />
+            {/* { @TODO Implement pagination } */}
+            {/* <Pagination /> */}
         </section>
     );
 };
