@@ -38,12 +38,10 @@ const Home = () => {
 
     useEffect(() => {
         // checkLogin();
+        // @TODO Implement pagination
 
-        if (!isAuth) {
-            // @TODO Implement pagination
-            fetchMovies({ limit: 0, offset: 0 });
-        }
-    }, [fetchMovies]);
+        fetchMovies({ limit: 0, offset: 0 });
+    }, []);
 
     const views = {
         home: movies.length ? (
