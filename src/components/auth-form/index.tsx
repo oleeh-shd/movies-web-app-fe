@@ -6,11 +6,11 @@ import { FC, useState } from "react";
 
 import { ErrorMessage } from "@hookform/error-message";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { AxiosError } from "axios";
 import { Controller, useForm } from "react-hook-form";
 
 import * as yup from "yup";
 
-import { CustomError } from "@/api/axios";
 import { useAuthStore } from "@/zustand/authStore";
 
 import { Button } from "../button";
@@ -51,28 +51,23 @@ export const AuthForm: FC<AuthFormProps> = ({ action }) => {
     });
 
     const router = useRouter();
+    const [loading, setLoading] = useState(false);
 
-    const [error, setError] = useState("");
-
-    const { signIn, signUp, loading } = useAuthStore();
+    const { signIn, signUp, error } = useAuthStore();
 
     const onSubmit = async ({ email, password }: FormInputs) => {
-        try {
-            if (action === "sign-in") {
-                await signIn({ email, password });
-            }
-
-            if (action === "sign-up") {
-                await signUp({ email, password });
-            }
-
-            setError("");
-            router.push("/");
-        } catch (error) {
-            console.log(error, "error");
-            setError((error as CustomError).response?.data.message);
+        setLoading(true);
+        if (action === "sign-in") {
+            await signIn({ email, password }, () => router.push("/"));
         }
+
+        if (action === "sign-up") {
+            await signUp({ email, password }, () => router.push("/"));
+        }
+
+        setLoading(false);
     };
+
     return (
         <form
             onSubmit={handleSubmit(onSubmit)}

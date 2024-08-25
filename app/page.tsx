@@ -1,10 +1,7 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-
 import { useEffect, useState } from "react";
 
-import { api } from "@/api/axios";
 import { Heading } from "@/components/heading";
 import { CreateMovie } from "@/views/create-movie";
 import { HomePage } from "@/views/home-page";
@@ -16,9 +13,7 @@ import { useMovieStore } from "@/zustand/useMovieStore";
 export type HomePageView = "home" | "create" | "update";
 
 const Home = () => {
-    const router = useRouter();
-
-    const { isAuth, logout } = useAuthStore();
+    const { isAuth, loading: authLoading } = useAuthStore();
     const { movies, loading, movieToUpdate, fetchMovies } = useMovieStore();
 
     const [view, setView] = useState<HomePageView>("home");
@@ -27,21 +22,12 @@ const Home = () => {
         setView(view);
     };
 
-    // const checkLogin = async () => {
-    //     try {
-    //         await api.get<{ userId: number }>("/auth/me");
-    //     } catch (error) {
-    //         logout();
-    //         router.push("/sign-in");
-    //     }
-    // };
-
     useEffect(() => {
-        // checkLogin();
-        // @TODO Implement pagination
-
-        fetchMovies({ limit: 0, offset: 0 });
-    }, []);
+        if (isAuth) {
+            // @TODO Implement pagination
+            fetchMovies({ limit: 0, offset: 0 });
+        }
+    }, [isAuth]);
 
     const views = {
         home: movies.length ? (
@@ -60,7 +46,7 @@ const Home = () => {
     };
     return (
         <main className="size-full text-white">
-            {loading ? (
+            {loading || authLoading ? (
                 <div className="flex size-full items-center justify-center">
                     <Heading variant="h2" title="Loading..." />
                 </div>

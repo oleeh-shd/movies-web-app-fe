@@ -1,7 +1,7 @@
 import { create } from "zustand";
 
 import { AuthBody, signIn, signUp } from "@/api/auth";
-import { api } from "@/api/axios";
+import { api, CustomError } from "@/api/axios";
 
 type User = {
     id: number | null;
@@ -14,11 +14,12 @@ type Store = {
     user: User;
     isAuth: boolean;
     loading: boolean;
+    error: string;
 };
 
 type Actions = {
-    signIn: (body: AuthBody) => Promise<void>;
-    signUp: (body: AuthBody) => Promise<void>;
+    signIn: (body: AuthBody, callback: () => void) => Promise<void>;
+    signUp: (body: AuthBody, callback: () => void) => Promise<void>;
     logout: () => void;
     checkLogin: () => Promise<void>;
 };
@@ -28,12 +29,13 @@ type AuthStore = Store & Actions;
 const initialState: Store = {
     user: { id: null, email: "", createdAt: "", updatedAt: "" },
     isAuth: false,
-    loading: false,
+    loading: true,
+    error: "",
 };
 
 export const useAuthStore = create<AuthStore>((set, get) => ({
     ...initialState,
-    signIn: async (body) => {
+    signIn: async (body, callback) => {
         try {
             set({ loading: true });
 
@@ -42,13 +44,14 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
             set({ user });
             set({ isAuth: true });
+            callback();
         } catch (error) {
-            console.log(error);
+            set({ error: (error as CustomError).response.data.message });
         } finally {
             set({ loading: false });
         }
     },
-    signUp: async (body) => {
+    signUp: async (body, callback) => {
         try {
             set({ loading: true });
 
@@ -57,16 +60,16 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
             set({ user });
             set({ isAuth: true });
+            callback();
         } catch (error) {
-            console.log(error);
+            set({ error: (error as CustomError).response.data.message });
         } finally {
             set({ loading: false });
         }
     },
     logout: () => {
-        set(initialState);
+        set({ ...initialState, loading: false });
         localStorage.removeItem("token");
-        set({ isAuth: false });
     },
     checkLogin: async () => {
         const logout = get().logout;
@@ -83,6 +86,8 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
             }
         } catch (error) {
             logout();
+        } finally {
+            set({ loading: false });
         }
     },
 }));
