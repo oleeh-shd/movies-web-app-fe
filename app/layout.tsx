@@ -1,7 +1,7 @@
 "use client";
 import { Montserrat } from "next/font/google";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 import "../src/styles/globals.css";
 import { useEffect } from "react";
@@ -22,6 +22,7 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     const router = useRouter();
+    const pathname = usePathname();
     const { isAuth, checkLogin, loading: authLoading } = useAuthStore();
 
     useEffect(() => {
@@ -29,7 +30,7 @@ export default function RootLayout({
     }, []);
 
     useEffect(() => {
-        if (!authLoading && !isAuth) {
+        if (!authLoading && !isAuth && pathname === "/") {
             router.push("/sign-in");
         }
 
