@@ -6,7 +6,6 @@ import { FC, useState } from "react";
 
 import { ErrorMessage } from "@hookform/error-message";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { AxiosError } from "axios";
 import { Controller, useForm } from "react-hook-form";
 
 import * as yup from "yup";

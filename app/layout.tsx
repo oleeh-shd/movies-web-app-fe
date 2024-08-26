@@ -26,7 +26,10 @@ export default function RootLayout({
     const { isAuth, checkLogin, loading: authLoading } = useAuthStore();
 
     useEffect(() => {
-        checkLogin();
+        const token = localStorage.getItem("token");
+        if (token) {
+            checkLogin();
+        }
     }, []);
 
     useEffect(() => {

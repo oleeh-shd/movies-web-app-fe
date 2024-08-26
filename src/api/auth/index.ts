@@ -5,12 +5,13 @@ export type AuthBody = {
     password: string;
 };
 
-type AuthResponse = {
+export type AuthResponse = {
     id: number;
     createdAt: string;
     updatedAt: string;
     email: string;
     accessToken: string;
+    refreshToken: string;
 };
 
 export const signUp = async (body: AuthBody) => {
