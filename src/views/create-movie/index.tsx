@@ -24,7 +24,7 @@ import { cn } from "@/utils/tailwind";
 
 import { useMovieStore } from "@/zustand/useMovieStore";
 
-import { HomePageView } from "../../../app/page";
+import { useViewStore } from "@/zustand/useViewStore";
 
 const validationSchema = yup.object().shape({
     title: yup.string().required("Please enter your movie title"),
@@ -48,17 +48,13 @@ type FormInputs = {
     posterId: string;
 };
 
-type CreateMovieProps = {
-    changeView: (view: HomePageView) => void;
-};
-
 const defaultFormVaues = {
     title: "",
     publishingYear: "",
     posterId: "",
 };
 
-export const CreateMovie: FC<CreateMovieProps> = ({ changeView }) => {
+export const CreateMovie: FC = () => {
     const {
         control,
         handleSubmit,
@@ -69,6 +65,7 @@ export const CreateMovie: FC<CreateMovieProps> = ({ changeView }) => {
         defaultValues: defaultFormVaues,
     });
 
+    const { changeView } = useViewStore();
     const { fetchMovies, loading } = useMovieStore();
 
     const [file, setFile] = useState<File | null>(null);
@@ -101,7 +98,7 @@ export const CreateMovie: FC<CreateMovieProps> = ({ changeView }) => {
             });
             toast.success(data.message);
 
-            await fetchMovies({ limit: 0, offset: 0 });
+            await fetchMovies(1);
 
             reset();
 
@@ -118,7 +115,7 @@ export const CreateMovie: FC<CreateMovieProps> = ({ changeView }) => {
                 <Heading
                     variant="h2"
                     title="Create a new movie"
-                    classes="mb-20 lg:mb-[120px] text-left!"
+                    classes="mb-20 lg:mb-[100px] text-left!"
                 />
             </div>
             <form

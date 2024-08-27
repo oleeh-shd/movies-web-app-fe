@@ -11,7 +11,6 @@ import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import * as yup from "yup";
 
-import { Movie } from "@/api/get-movie-list";
 import { updateMovie } from "@/api/update-movie";
 import { uploadPoster } from "@/api/upload-poster";
 import { Button } from "@/components/button";
@@ -24,7 +23,7 @@ import { cn } from "@/utils/tailwind";
 
 import { useMovieStore } from "@/zustand/useMovieStore";
 
-import { HomePageView } from "../../../app/page";
+import { useViewStore } from "@/zustand/useViewStore";
 
 const validationSchema = yup.object().shape({
     title: yup.string(),
@@ -47,15 +46,10 @@ type FormInputs = {
     posterId: number;
 };
 
-type UpdateMovieProps = {
-    movieToUpdate: Movie;
-    changeView: (view: HomePageView) => void;
-};
+export const UpdateMovie: FC = () => {
+    const { changeView } = useViewStore();
+    const { fetchMovies, movieToUpdate, currentPage } = useMovieStore();
 
-export const UpdateMovie: FC<UpdateMovieProps> = ({
-    movieToUpdate,
-    changeView,
-}) => {
     const {
         control,
         handleSubmit,
@@ -68,8 +62,6 @@ export const UpdateMovie: FC<UpdateMovieProps> = ({
             publishingYear: String(movieToUpdate.publishingYear),
         },
     });
-
-    const { fetchMovies } = useMovieStore();
 
     const [file, setFile] = useState<File | null>(null);
     const [uploading, setUploading] = useState(false);
@@ -102,7 +94,7 @@ export const UpdateMovie: FC<UpdateMovieProps> = ({
                     : undefined,
             });
 
-            await fetchMovies({ limit: 0, offset: 0 });
+            await fetchMovies(currentPage);
 
             toast.success(data.message);
 
@@ -120,7 +112,7 @@ export const UpdateMovie: FC<UpdateMovieProps> = ({
                 <Heading
                     variant="h2"
                     title="Update movie"
-                    classes="mb-20 lg:mb-[120px] text-left!"
+                    classes="mb-20 lg:mb-[100px] text-left!"
                 />
             </div>
 
