@@ -1,19 +1,17 @@
 "use client";
 
-import { useState } from "react";
-
 import { Heading } from "@/components/heading";
 import { CreateMovie } from "@/views/create-movie";
 import { HomePage } from "@/views/home-page";
 import { UpdateMovie } from "@/views/update-movie";
 import { useAuthStore } from "@/zustand/authStore";
+import { useViewStore } from "@/zustand/useViewStore";
 
 export type HomePageView = "home" | "create" | "update";
 
 const Home = () => {
     const { loading } = useAuthStore();
-
-    const [view, setView] = useState<HomePageView>("home");
+    const { view } = useViewStore();
 
     const views = {
         home: <HomePage />,
