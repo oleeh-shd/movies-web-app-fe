@@ -29,6 +29,8 @@ export default function RootLayout({
         const token = localStorage.getItem("token");
         if (token) {
             checkLogin();
+        } else {
+            router.push("/sign-in");
         }
     }, []);
 

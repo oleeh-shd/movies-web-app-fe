@@ -8,6 +8,7 @@ import { ErrorMessage } from "@hookform/error-message";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Controller, useForm } from "react-hook-form";
 
+import { toast } from "react-toastify";
 import * as yup from "yup";
 
 import { useAuthStore } from "@/zustand/authStore";
@@ -56,15 +57,20 @@ export const AuthForm: FC<AuthFormProps> = ({ action }) => {
 
     const onSubmit = async ({ email, password }: FormInputs) => {
         setLoading(true);
-        if (action === "sign-in") {
-            await signIn({ email, password }, () => router.push("/"));
-        }
 
-        if (action === "sign-up") {
-            await signUp({ email, password }, () => router.push("/"));
-        }
+        try {
+            if (action === "sign-in") {
+                await signIn({ email, password }, () => router.push("/"));
+            }
 
-        setLoading(false);
+            if (action === "sign-up") {
+                await signUp({ email, password }, () => router.push("/"));
+            }
+        } catch (error) {
+            toast.error("Something wrong with server");
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
