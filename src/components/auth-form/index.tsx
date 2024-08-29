@@ -11,16 +11,15 @@ import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import * as yup from "yup";
 
+import { AuthBody } from "@/api/auth";
 import { useAuthStore } from "@/zustand/authStore";
 
 import { Button } from "../button";
+import { Checkbox } from "../checkbox";
 import { Input } from "../input";
 import { Loader } from "../loader";
 
-type FormInputs = {
-    email: string;
-    password: string;
-};
+type FormInputs = AuthBody;
 
 const validationSchema = yup.object({
     email: yup
@@ -33,6 +32,7 @@ const validationSchema = yup.object({
         .trim()
         .min(8, "Should contain at least 8 characters")
         .required("Please enter your password"),
+    rememberMe: yup.boolean().default(false),
 });
 
 type ActionType = "sign-in" | "sign-up";
@@ -55,16 +55,15 @@ export const AuthForm: FC<AuthFormProps> = ({ action }) => {
 
     const { signIn, signUp, error } = useAuthStore();
 
-    const onSubmit = async ({ email, password }: FormInputs) => {
+    const onSubmit = async (body: FormInputs) => {
         setLoading(true);
-
         try {
             if (action === "sign-in") {
-                await signIn({ email, password }, () => router.push("/"));
+                await signIn(body, () => router.push("/"));
             }
 
             if (action === "sign-up") {
-                await signUp({ email, password }, () => router.push("/"));
+                await signUp(body, () => router.push("/"));
             }
         } catch (error) {
             toast.error("Something wrong with server");
@@ -132,9 +131,16 @@ export const AuthForm: FC<AuthFormProps> = ({ action }) => {
                 <span className="ml-3 text-sm text-red-500">{error}</span>
             ) : null}
 
-            {/* <div className="mx-auto">
-                <Checkbox />
-            </div> */}
+            <Controller
+                name="rememberMe"
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                    <div className="mx-auto">
+                        <Checkbox checked={value} onChange={onChange} />
+                    </div>
+                )}
+            />
+
             <Button
                 type="submit"
                 variant="contained"

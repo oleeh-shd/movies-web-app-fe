@@ -3,6 +3,7 @@ import { api } from "../axios";
 export type AuthBody = {
     email: string;
     password: string;
+    rememberMe: boolean;
 };
 
 export type AuthResponse = {

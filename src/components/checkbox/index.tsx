@@ -1,6 +1,8 @@
-import { FC } from "react";
+import { FC, InputHTMLAttributes } from "react";
 
-export const Checkbox: FC = () => {
+type Props = InputHTMLAttributes<HTMLInputElement>;
+
+export const Checkbox: FC<Props> = (props) => {
     return (
         <div className="relative mb-4 flex items-center">
             <input
@@ -15,8 +17,7 @@ export const Checkbox: FC = () => {
                             checked:after:bg-transparent 
                             checked:after:content-[''] hover:outline"
                 type="checkbox"
-                value=""
-                id="remember"
+                {...props}
             />
             <label
                 className="inline-block cursor-pointer pl-2 text-base font-normal text-white"
