@@ -1,7 +1,7 @@
 import { FC, useEffect } from "react";
 
 import { Header } from "@/components/header";
-import { Heading } from "@/components/heading";
+import { HeaderSkeleton } from "@/components/header/header-skeleton";
 import { MovieList } from "@/components/movie-list";
 import { Pagination } from "@/components/pagination";
 
@@ -18,14 +18,15 @@ export const HomePage: FC = () => {
         if (isAuth) {
             fetchMovies(currentPage);
         }
-    }, [isAuth, currentPage]);
+    }, [isAuth, currentPage, fetchMovies]);
 
     return (
         <section className="mb-[100px] flex size-full flex-col items-center">
             {loading && !totalMovies ? (
-                <div className="flex size-full items-center justify-center">
-                    <Heading variant="h2" title="Loading..." />
-                </div>
+                <>
+                    <HeaderSkeleton />
+                    <MovieList />
+                </>
             ) : totalMovies ? (
                 <>
                     <Header />

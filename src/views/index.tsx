@@ -2,7 +2,8 @@
 
 import { FC } from "react";
 
-import { Heading } from "@/components/heading";
+import { HeaderSkeleton } from "@/components/header/header-skeleton";
+import { MovieList } from "@/components/movie-list";
 import { useAuthStore } from "@/zustand/authStore";
 import { useViewStore } from "@/zustand/useViewStore";
 
@@ -22,9 +23,10 @@ export const HomeView: FC = () => {
     return (
         <main className="size-full text-white">
             {loading ? (
-                <div className="flex size-full items-center justify-center">
-                    <Heading variant="h2" title="Loading..." />
-                </div>
+                <section className="mb-[100px] flex size-full flex-col items-center">
+                    <HeaderSkeleton />
+                    <MovieList />
+                </section>
             ) : (
                 views[view]
             )}
