@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-import { HomePageView } from "../../app/page";
+export type HomePageView = "home" | "create" | "update";
 
 type ViewStore = {
     view: HomePageView;
